@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # http://concourse.ci/implementing-resources.html#resource-check
 
@@ -8,6 +8,10 @@ set -e
 payload=`cat`
 bucket=$(echo "$payload" | jq -r '.source.bucket')
 prefix="$(echo "$payload" | jq -r '.source.path // ""')"
+version="$(echo "$payload" | jq -r '.version // ""')"
+if [ -n "$version" ]; then
+  last_timestamp="$(echo "$payload" | jq -r '.version.LastModified // ""')"
+fi
 
 # export for `aws` cli
 AWS_ACCESS_KEY_ID=$(echo "$payload" | jq -r '.source.access_key_id // empty')
@@ -26,4 +30,13 @@ fi
 # Consider the most recent LastModified timestamp as the most recent version.
 timestamps=$(aws s3api list-objects --bucket $bucket --prefix "$prefix" --query 'Contents[].{LastModified: LastModified}')
 recent="$(echo $timestamps | jq -r 'max_by(.LastModified)')"
-echo "[$recent]"
+recent_timestamp="$(echo "$recent" | jq -r '.LastModified')"
+if [ -n "$version" ]; then
+  if [ "$last_timestamp" = "$recent_timestamp" ]; then
+    printf "[$version]"
+  else
+    printf "[$version,\n$recent]"
+  fi
+else
+  printf "[$recent]"
+fi
