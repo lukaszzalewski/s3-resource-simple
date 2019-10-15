@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Resource Impl: http://concourse.ci/implementing-resources.html#in:-fetch-a-given-resource
 set -e
@@ -19,6 +19,10 @@ payload=`cat`
 bucket=$(echo "$payload" | jq -r '.source.bucket')
 path=$(echo "$payload" | jq -r '.source.path // ""')
 options=$(echo "$payload" | jq -r '.source.options // [] | join(" ")')
+version="$(echo "$payload" | jq -r '.version // ""')"
+if [ -n "$version" ]; then
+  last_timestamp="$(echo "$payload" | jq -r '.version.LastModified // ""')"
+fi
 
 # export for `aws` cli
 AWS_ACCESS_KEY_ID=$(echo "$payload" | jq -r '.source.access_key_id // empty')
@@ -38,4 +42,7 @@ echo "Downloading from S3..."
 eval aws s3 sync "s3://$bucket/$path" $dest $options
 echo "...done."
 
-source "$(dirname $0)/emit.sh" >&3
+timestamps=$(aws s3api list-objects --bucket $bucket --prefix "$prefix" --query 'Contents[].{LastModified: LastModified}')
+recent="$(echo $timestamps | jq -r 'max_by(.LastModified)')"
+
+printf "{\"version\":$version,\"metadata\":[\"name\":\"Timestamp\",\"value\":\"$last_timestamp\"]}"
