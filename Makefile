@@ -1,3 +1,5 @@
+DOCKER_TARGET='justonecommand/s3-sync:0.7'
+
 all: login-ecr build-docker push-docker
 	
 login-ecr:
