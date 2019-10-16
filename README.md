@@ -1,6 +1,10 @@
-# Simple S3 Resource for [Concourse CI](http://concourse.ci)
+# S3 Sync Resource for [Concourse CI](http://concourse.ci)
 
-Resource to upload files to S3. Unlike the [the official S3 Resource](https://github.com/concourse/s3-resource), this Resource can upload or download multiple files.
+## Based on work from [18F/s3-resource-simple](https://github.com/18F/s3-resource-simple)
+
+This is a drop in replacement for 18F/s3-resource-simple
+
+Resource to upload files to S3. Unlike the [the official S3 Resource](https://github.com/concourse/s3-resource), this Resource can upload or download multiple files. The sync uses the last modified value in s3 to coordinate builds and ensure downstream resources can access data.
 
 ## Usage
 
