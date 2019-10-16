@@ -15,7 +15,7 @@ resource_types:
 - name: <resource type name>
   type: docker-image
   source:
-    repository: 18fgsa/s3-resource-simple
+    repository: justonecommand/s3-resource-simple
 resources:
 - name: <resource name>
   type: <resource type name>
