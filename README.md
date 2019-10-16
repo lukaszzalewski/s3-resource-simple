@@ -15,7 +15,7 @@ resource_types:
 - name: <resource type name>
   type: docker-image
   source:
-    repository: justonecommand/s3-resource-simple
+    repository: justonecommand/s3-sync
 resources:
 - name: <resource name>
   type: <resource type name>
