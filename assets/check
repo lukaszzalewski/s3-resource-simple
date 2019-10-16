@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # http://concourse.ci/implementing-resources.html#resource-check
 
@@ -35,7 +35,7 @@ if [ -n "$version" ]; then
   if [ "$last_timestamp" = "$recent_timestamp" ]; then
     printf "[$version]"
   else
-    printf "[$version,\n$recent]"
+    printf "[$version, $recent]"
   fi
 else
   printf "[$recent]"

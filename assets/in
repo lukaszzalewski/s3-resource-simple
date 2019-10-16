@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Resource Impl: http://concourse.ci/implementing-resources.html#in:-fetch-a-given-resource
 set -e
@@ -19,7 +19,7 @@ payload=`cat`
 bucket=$(echo "$payload" | jq -r '.source.bucket')
 path=$(echo "$payload" | jq -r '.source.path // ""')
 options=$(echo "$payload" | jq -r '.source.options // [] | join(" ")')
-version="$(echo "$payload" | jq -r '.version // ""')"
+version="$(echo "$payload" | jq -r '.version // ""' | tr -d '\n\t ')"
 if [ -n "$version" ]; then
   last_timestamp="$(echo "$payload" | jq -r '.version.LastModified // ""')"
 fi
@@ -45,4 +45,4 @@ echo "...done."
 timestamps=$(aws s3api list-objects --bucket $bucket --prefix "$prefix" --query 'Contents[].{LastModified: LastModified}')
 recent="$(echo $timestamps | jq -r 'max_by(.LastModified)')"
 
-printf "{\"version\":$version,\"metadata\":[\"name\":\"Timestamp\",\"value\":\"$last_timestamp\"]}"
+printf "{\"version\":$version,\"metadata\":[{\"name\":\"Timestamp\",\"value\":\"$last_timestamp\"}]}" >&3
